@@ -7,6 +7,7 @@ import { registerUser, signInUser } from "./controllers/user";
 import { createBuilding } from "./controllers/building";
 import { verifyJWT } from "./middleware/verifyJwt";
 
+
 const app: Express = express();
 app.use(express.json()); // Parse JSON request body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
