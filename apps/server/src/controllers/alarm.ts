@@ -5,11 +5,11 @@ const triggerAlarm = async (req: any, res: any) => {
         const { buildingId } = req.body;
         
 
-        const newAlert = await prismaClient.alarm.create({
+        const newAlert:any = await prismaClient.alarm.create({
             data: { buildingId },     
-
+        });
         // Notify fire team
-        notifyFireTeam(buildingId);
+        // notifyFireTeam(buildingId);
 
         res.status(201).json({ message: "Fire alert triggered", alert: newAlert });
     } catch (error) {

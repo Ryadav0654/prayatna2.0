@@ -45,6 +45,15 @@ model Building {
   owner    User @relation("OwnerBuildings", fields: [ownerId], references: [id])
 
   applications Application[]
+  alarms       Alarm[] // One-to-many relation with Alarm
+}
+
+model Alarm {
+  id          String   @id @default(uuid())
+  buildingId  String
+  building    Building @relation(fields: [buildingId], references: [id])
+  timestamp   DateTime @default(now()) // Stores the current time
+  status      AlarmStatus @default(PENDING) // Status with default value
 }
 
 model Inspection {
@@ -82,4 +91,10 @@ enum InspectionStatus {
   PENDING
   PASSED
   FAILED
+}
+
+enum AlarmStatus {
+  PENDING
+  DEPARTED
+  RESOLVED
 }
