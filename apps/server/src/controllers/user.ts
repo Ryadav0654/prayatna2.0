@@ -15,7 +15,8 @@ interface RegisterUserRequest {
 export const registerUser = async (req: any, res: any) => {
   try {
     const { name, email, phone, password, role }: RegisterUserRequest = req.body;
-
+    console.log("req.body", req.body);
+    
     // Check if user already exists
     const existingUser = await prismaClient.user.findUnique({ where: { email } });
 

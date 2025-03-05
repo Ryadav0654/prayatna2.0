@@ -5,6 +5,7 @@ import { navLinks } from '../utils/constant';
 import { motion } from 'motion/react';
 import Button from './Button';
 import { useRouter } from 'next/navigation';
+import Logo from './icons/Logo';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,9 +25,10 @@ const Navbar = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 text-white ">
         <div className="flex justify-between items-center py-5">
           {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link href="/">
-              <span className="text-xl lg:text-2xl font-extrabold">Fire</span>
+          <div className="flex-shrink-0 ">
+            <Link href="/" className='flex items-center gap-2'>
+            <Logo/>
+              <span className="text-xl lg:text-2xl font-extrabold">SmartFireNet</span>
             </Link>
           </div>
 

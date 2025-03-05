@@ -7,13 +7,16 @@ import { registerUser, signInUser } from "./controllers/user";
 import { createBuilding } from "./controllers/building";
 import { verifyJWT } from "./middleware/verifyJwt";
 import { triggerAlarm } from "./controllers/alarm";
-
+import cors from "cors";
 
 const app: Express = express();
 app.use(express.json()); // Parse JSON request body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
 app.use(cookieParser());
-// app.use(cors());
+app.use(cors({
+    origin:"http://localhost:3000",
+    credentials:true
+}));
 // app.use(express.json());
 app.get("/", (req, res) => {
     res.send("Hello From Server of Turbo!");
@@ -27,6 +30,7 @@ app.post("/building/create",verifyJWT,createBuilding);
 
 //trigger alarm
 app.post("/alarm/trigger",triggerAlarm);
+
 app.listen(process.env.SERVER_PORT, async() => {
 
     try {

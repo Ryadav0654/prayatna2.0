@@ -8,17 +8,18 @@ export const navLinks = [
         path: "/guildlines"
     },
     {
+        name: "Add Building",
+        path: "/building"
+    },
+    {
         name: "Emergency",
         path: "/emergency"
     },
-    // {
-    //     name: "Projects",
-    //     path: "/projects"
-    // },
-    // {
-    //     name: "Service",
-    //     path: "/service"
-    // },
+    
+    {
+        name: "Alarm",
+        path: "/alarm"
+    },
     // {
     //     name: "Contact",
     //     path: "/contact"
