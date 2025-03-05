@@ -85,3 +85,17 @@ export const processApplication = async (req: any, res: any) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+export const getAllNocs = async (req: any, res: any) => {
+    try {
+        // Fetch all applications (NOCs) from the database
+        const applications = await prismaClient.application.findMany();
+
+        // Return response
+        res.json(applications);
+    } catch (error: any) {
+        console.error("❌ Error fetching NOCs:", error.message);
+        res.status(500).json({ success: false, error: "Failed to fetch NOCs" });
+    }
+};

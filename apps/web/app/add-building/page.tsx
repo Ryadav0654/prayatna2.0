@@ -12,7 +12,7 @@ import Error from "../../components/Error";
 
 type BuildingFormData = {
   name: string;
-  location: string;
+  address: string;
   latitude: number;
   longitude: number;
   nocStatus: "Applied" | "Pending" | "Approved" | "Denied";
@@ -43,6 +43,8 @@ const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
 
   const onSubmit = async (data: BuildingFormData) => {
     // Passing latitude and longitude to the onAddBuilding function
+    console.log(data);
+    
     try {
       setError({ isError: false, message: "" });
       setLoading(true);
@@ -50,11 +52,11 @@ const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
         "http://localhost:8080/building/create",
         {
           ...data,
-          latitude,
-          longitude,
+          latitude:latitude.toString(),
+          longitude:longitude.toString(),
         }
       );
-      if (res.status === 201) {
+      if (res.status === 200) {
         toast.success(res.data.message);
         window.location.reload();
       }
@@ -97,6 +99,11 @@ const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
         if(response.status === 201){
           console.log("all building res: ", response);
           const data = response.data;
+          data.forEach((element:any) => {
+            element.nocStatus = "Pending";
+          });
+          console.log(data);
+          
           setBuildings(data);
         }
         setLoading(false);
@@ -157,10 +164,10 @@ const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
             type="text"
             id="location"
             Style="w-full px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white/80 font-semibold"
-            {...register("location", { required: "Location is required" })}
+            {...register("address", { required: "Location is required" })}
           />
-          {errors.location && (
-            <p className="text-red-500 text-sm">{errors.location.message}</p>
+          {errors.address && (
+            <p className="text-red-500 text-sm">{errors.address.message}</p>
           )}
         </div>
 

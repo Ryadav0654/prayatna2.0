@@ -9,7 +9,7 @@ import { createBuilding, getAllBuildings } from "./controllers/building";
 import { verifyJWT } from "./middleware/verifyJwt";
 import { triggerAlarm } from "./controllers/alarm";
 import cors from "cors";
-import { createApplication, processApplication } from "./controllers/noc";
+import { createApplication, getAllNocs, processApplication } from "./controllers/noc";
 import { upload } from "./middleware/multer";
 const app: Express = express();
 // Parse JSON request body
@@ -42,6 +42,7 @@ app.post("/alarm/trigger",triggerAlarm);
 
 app.post("/noc/application",verifyJWT,createApplication)
 app.post("/noc/process",upload.single("document"),processApplication)
+app.get("/allnocs",getAllNocs)
 app.listen(process.env.SERVER_PORT, async() => {
 
     try {
