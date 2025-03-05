@@ -7,6 +7,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import Error from "../../components/Error";
 
 interface RegisterProps {
   name: string;
@@ -23,9 +24,11 @@ const Register = () => {
     formState: { errors },
   } = useForm<RegisterProps>();
   const router = useRouter();
+  const [error, setError] = React.useState({isError: false, message: ""});
   const handleRegister: SubmitHandler<RegisterProps> = async (data) => {
     try {
       reset();
+      setError({isError: false, message: ""});
       console.log("data in register", data);
       const res = await apiClient.post("http://localhost:8080/users/register", { ...data });
       if(res.status === 201){
@@ -35,10 +38,16 @@ const Register = () => {
         }, 1000);
       }
       console.log("res in register", res);
-    } catch (error) {
+    } catch (error: any) {
+      setError({isError: true, message: error.response.data.message});
       console.error("error occured while register: ", error);
     }
   };
+
+  if(error.isError){
+    toast.error(error.message);
+    <Error message={error.message}/>
+  }
 
   return (
     <div className="flex h-screen  w-full  justify-center items-start lg:px-24 lg:py-10 mt-[10%]">

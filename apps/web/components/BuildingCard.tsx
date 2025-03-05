@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Define the type for a Building object
-type Building = {
+export type Building = {
   id: number;
   name: string;
   location: string;
@@ -63,7 +63,11 @@ const buildings: Building[] = [
  
 ];
 
-const BuildingCard: React.FC = () => {
+type BuildingCardProps = {
+  buildings: Building[];
+};
+
+const BuildingCard: React.FC<BuildingCardProps> = ({ buildings }) => {
   return (
     <div className='px-16 py-8'>
     <h1 className="text-5xl md:text-4xl font-extrabold text-white">Building List</h1>

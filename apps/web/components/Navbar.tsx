@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import Button from './Button';
 import { useRouter } from 'next/navigation';
 import Logo from './icons/Logo';
+import apiClient from '../utils/apiclient';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +21,23 @@ const Navbar = () => {
     hidden: { opacity: 0, x: -100 },
   }
 
+  let token;
+  if(typeof window !== 'undefined' && window.localStorage){
+    token = localStorage.getItem("token");
+  }
+ 
+  const handleLogout = async () => {
+    try {
+      const res = await apiClient.post("/users/logout", {});
+      if (res.status === 201) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
   return (
     <nav className='sticky top-0 z-50 backdrop-blur-2xl'>
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 xl:px-24 text-white ">
@@ -67,7 +85,17 @@ const Navbar = () => {
                     </Link>
                 ))
             }
-            <Button name="Login" styles="rounded-2xl px-4 py-2 font-semibold" onclick={() => router.push("/login")}/> 
+            {
+              token ? (
+                <Button name="Logout" styles="rounded-2xl px-4 py-2 font-semibold" onclick={() => {
+                  handleLogout();
+                
+                }}/>
+              ) : (
+                <Button name="Login" styles="rounded-2xl px-4 py-2 font-semibold" onclick={() => router.push("/login")}/> 
+              )
+              
+            }
           </div>
         </div>
       </div>

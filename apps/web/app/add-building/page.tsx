@@ -1,12 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
 import apiClient from "../../utils/apiclient";
 import toast from "react-hot-toast";
-import BuildingCard from "../show-building/page";
-import { Building } from "../show-building/page";
+import BuildingCard from "../../components/BuildingCard";
+import { Building } from "../../components/BuildingCard";
+import Loading from "../../components/Loading";
+import Error from "../../components/Error";
+
 type BuildingFormData = {
   name: string;
   location: string;
@@ -35,9 +38,14 @@ const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
     formState: { errors },
   } = useForm<BuildingFormData>();
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState({ isError: false, message: "" });
+
   const onSubmit = async (data: BuildingFormData) => {
     // Passing latitude and longitude to the onAddBuilding function
     try {
+      setError({ isError: false, message: "" });
+      setLoading(true);
       const res = await apiClient.post(
         "http://localhost:8080/building/create",
         {
@@ -50,9 +58,11 @@ const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
         toast.success(res.data.message);
         window.location.reload();
       }
-
+      setLoading(false);
       reset(); // Reset the form after submission
-    } catch (error) {
+    } catch (error: any) {
+      setLoading(false);
+      setError({ isError: true, message: error.response.data.message });
       console.log("error occurred while adding building: ", error);
     }
   };
@@ -81,20 +91,32 @@ const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
   useEffect(() => {
     const getAllBuildings = async () => {
       try {
+        setError({ isError: false, message: "" });
+        setLoading(true);
         const response = await apiClient.get("/building/all");
         if(response.status === 201){
           console.log("all building res: ", response);
           const data = response.data;
           setBuildings(data);
         }
+        setLoading(false);
         // console.log(data);
-      } catch (error) {
+      } catch (error: any) {
+        setLoading(false);
+        setError({ isError: true, message: error.response.data.message });
         console.error(error);
     }
   }
   getAllBuildings();
   }, []);
 
+  if(error.isError){
+    <Error message={error.message} />;
+  }
+
+  if(loading){
+    return <Loading text="Adding Building..." />;
+  }
   return (
     <>
     <form

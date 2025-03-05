@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Navbar from "../components/Navbar";
@@ -9,13 +9,21 @@ import apiClient from "../utils/apiclient";
 import EmergencyAlertPopup from "../components/TriggeredPopup";
 import Footer from "../components/Footer";
 import KeyFeatures from "../components/KeyFeatures";
+import Chatbot from "../components/Chatbot";
+import Loading from "../components/Loading";
+import Error from "../components/Loading";
+import ChatBoard from "../components/ChatBoard";
 
 export default function Home() {
   const router = useRouter();
   const [triggered, setTriggered] = useState(false);
   const [building, setBuilding] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState({ isError: false, message: "" });
   const triggerAlert = async () => {
     try {
+      setError({ isError: false, message: "" });
+      setLoading(true);
       const res = await apiClient.post("http://localhost:8080/alarm/trigger", {
         buildingId: "5013d178-62dd-4f02-aa0d-7c34d4228cd0",
       });
@@ -24,55 +32,25 @@ export default function Home() {
       if (res.status === 201) {
         setTriggered(true);
       }
-    } catch (error) {
+      setLoading(false);
+    } catch (error: any) {
+      setLoading(false);
+      setError({ isError: true, message: error.response.data.message });
       console.error("error occured while trigger: ", error);
     }
   };
 
-  // const getCurrentLocation = async () => {
-  //   try {
-  //     console.log("getCurrentLocation");
+  if (loading) {
+    return <Loading text="Your request is being processed..." />;
+  }
 
-  //     if (navigator.geolocation) {
-  //       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-  //         navigator.geolocation.getCurrentPosition(resolve, reject);
-  //       });
-
-  //       console.log(position);
-  //       console.log(position.coords.latitude);
-  //       console.log(position.coords.longitude);
-
-  //       return position; // Now this returns the position asynchronously
-  //     } else {
-  //       console.error("Geolocation is not supported by this browser.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error occurred while getting current location: ", error);
-  //   }
-  // };
-
-  // const createBuilding = async () => {
-  //   try {
-  //     const location = await getCurrentLocation();
-  //     const longitude = (location?.coords.longitude)?.toString();
-  //     const latitude = (location?.coords.latitude)?.toString();
-  //     console.log("location in trigger", location);
-  //     const res = await apiClient.post("http://localhost:8080/building/create", {
-  //       address: "indore",
-  //       latitude: latitude,
-  //       longitude: longitude
-  //     });
-  //     console.log("res in createBuilding");
-  //     console.log("res in createBuilding", res);
-  //     if(res.status === 201){
-  //       setBuilding(true);
-  //     }
-  //   } catch (error) {
-  //     console.error("error occured while add building: ", error);
-  //   }
-  // }
+  if (error.isError) {
+    return <Error text={error.message} />;
+  }
   return (
-    <div className="w-full">
+    <div className="w-full relative">
+      <ChatBoard/>
+      {/* <Chatbot /> */}
       {triggered && (
         <EmergencyAlertPopup
           isOpen={triggered}
