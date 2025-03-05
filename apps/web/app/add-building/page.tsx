@@ -1,15 +1,18 @@
 "use client";
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-// import apiClient from '../../utils/apiclient';
-import axios from 'axios';
-
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import Button from "../../components/Button";
+import Input from "../../components/Input";
+import apiClient from "../../utils/apiclient";
+import toast from "react-hot-toast";
+import BuildingCard from "../show-building/page";
+import { Building } from "../show-building/page";
 type BuildingFormData = {
   name: string;
   location: string;
   latitude: number;
   longitude: number;
-  nocStatus: 'Applied' | 'Pending' | 'Approved' | 'Denied';
+  nocStatus: "Applied" | "Pending" | "Approved" | "Denied";
 };
 
 interface AddBuildingFormProps {
@@ -17,53 +20,50 @@ interface AddBuildingFormProps {
   isAdmin: boolean; // Pass isAdmin prop to control NOC status editability
 }
 
-const AddBuildingForm: React.FC<AddBuildingFormProps> = ({ onAddBuilding, isAdmin }) => {
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<BuildingFormData>({
-    defaultValues: {
-      name: '',
-      location: '',
-      latitude: 0,
-      longitude: 0,
-      nocStatus: 'Pending', // Default to 'Pending'
-    },
-  });
+const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
+  onAddBuilding,
+  isAdmin,
+}) => {
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
+  const [buildings, setBuildings] = React.useState<Building[]>([]);
 
-  const [useCurrentLocation, setUseCurrentLocation] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<BuildingFormData>();
 
-  const onSubmit = (data: BuildingFormData) => {
-    onAddBuilding(data); // Add the new building
-    reset(); // Reset the form after submission
-  };
+  const onSubmit = async (data: BuildingFormData) => {
+    // Passing latitude and longitude to the onAddBuilding function
+    try {
+      const res = await apiClient.post(
+        "http://localhost:8080/building/create",
+        {
+          ...data,
+          latitude,
+          longitude,
+        }
+      );
+      if (res.status === 201) {
+        toast.success(res.data.message);
+        window.location.reload();
+      }
 
-  const handleLocationToggle = () => {
-    setUseCurrentLocation(!useCurrentLocation);
-    if (!useCurrentLocation) {
-      // Clear manually entered location if switching to current location
-      setValue('location', '');
-      setValue('latitude', 0);
-      setValue('longitude', 0);
+      reset(); // Reset the form after submission
+    } catch (error) {
+      console.log("error occurred while adding building: ", error);
     }
   };
 
-  const getLocation = async (longitude: number, latitude: number) => {
-      try {
-        const location = await axios.get(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}%2C+${longitude}&key=91539d8ff79d4e808a96466a519760f5`);
-        console.log("location", location);
-        return location;
-      } catch (error) {
-        console.error("Error fetching location: ", error);
-      };
-
-  }
-  const fetchCurrentLocation = () => {
+  const fetchCurrentLocation = async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
-          getLocation(longitude, latitude);
-          setValue('latitude', latitude);
-          setValue('longitude', longitude);
-        //   setValue('location', 'Current Location');
+          setLatitude(latitude);
+          setLongitude(longitude);
         },
         (error) => {
           console.error("Error fetching current location: ", error);
@@ -74,121 +74,111 @@ const AddBuildingForm: React.FC<AddBuildingFormProps> = ({ onAddBuilding, isAdmi
     }
   };
 
-  // If "Use Current Location" is checked, fetch the current location
-  React.useEffect(() => {
-    if (useCurrentLocation) {
-      fetchCurrentLocation();
+  useEffect(() => {
+    fetchCurrentLocation();
+  }, []);
+  
+  useEffect(() => {
+    const getAllBuildings = async () => {
+      try {
+        const response = await apiClient.get("/building/all");
+        if(response.status === 201){
+          console.log("all building res: ", response);
+          const data = response.data;
+          setBuildings(data);
+        }
+        // console.log(data);
+      } catch (error) {
+        console.error(error);
     }
-  }, [useCurrentLocation]);
+  }
+  getAllBuildings();
+  }, []);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto bg-white p-6 rounded-xl shadow-2xl">
-      <h2 className="text-3xl font-bold mb-4 text-center text-indigo-600">Add New Building</h2>
+    <>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full mx-auto bg-transparent py-8 px-16  rounded-2xl shadow-xl space-y-6"
+    >
+      <h2 className="text-3xl font-extrabold text-white mb-6">
+        Add New Building
+      </h2>
 
-      <div className="mb-4">
-        <label htmlFor="name" className="block text-lg text-gray-800">Building Name</label>
-        <input
-          type="text"
-          id="name"
-          className="w-full p-3 border border-gray-300 rounded-lg"
-          {...register('name', { required: 'Building name is required' })}
-        />
-        {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-      </div>
+      {/* Grid Layout: 3 columns for medium and above screens */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Building Name */}
+        <div className="flex flex-col">
+          <label htmlFor="name" className="text-xl font-medium text-white/80">
+            Building Name
+          </label>
+          <Input
+            type="text"
+            id="name"
+            Style="w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white/80 font-semibold"
+            {...register("name", { required: "Building name is required" })}
+          />
+          {errors.name && (
+            <p className="text-red-500 text-sm">{errors.name.message}</p>
+          )}
+        </div>
 
-      <div className="mb-4">
-        <label htmlFor="location" className="block text-lg text-gray-800">Location</label>
-        <input
-          type="text"
-          id="location"
-          className="w-full p-3 border border-gray-300 rounded-lg"
-          {...register('location', { required: 'Location is required' })}
-          disabled={useCurrentLocation}
-        />
-        {errors.location && <p className="text-red-500">{errors.location.message}</p>}
-      </div>
-
-      <div className="mb-4">
-        <label htmlFor="latitude" className="block text-lg text-gray-800">Latitude</label>
-        <input
-          type="number"
-          id="latitude"
-          className="w-full p-3 border border-gray-300 rounded-lg"
-          {...register('latitude', { required: 'Latitude is required' })}
-          disabled={useCurrentLocation}
-        />
-        {errors.latitude && <p className="text-red-500">{errors.latitude.message}</p>}
-      </div>
-
-      <div className="mb-4">
-        <label htmlFor="longitude" className="block text-lg text-gray-800">Longitude</label>
-        <input
-          type="number"
-          id="longitude"
-          className="w-full p-3 border border-gray-300 rounded-lg"
-          {...register('longitude', { required: 'Longitude is required' })}
-          disabled={useCurrentLocation}
-        />
-        {errors.longitude && <p className="text-red-500">{errors.longitude.message}</p>}
-      </div>
-
-      {/* NOC Status Field (Editable only for Admin) */}
-      {isAdmin && (
-        <div className="mb-4">
-          <label htmlFor="nocStatus" className="block text-lg text-gray-800">NOC Status</label>
-          <select
-            id="nocStatus"
-            className="w-full p-3 border border-gray-300 rounded-lg"
-            {...register('nocStatus')}
+        {/* Location */}
+        <div className="flex flex-col">
+          <label
+            htmlFor="location"
+            className="text-xl font-medium text-white/80"
           >
-            <option value="Pending">Pending</option>
-            <option value="Applied">Applied</option>
-            <option value="Approved">Approved</option>
-            <option value="Denied">Denied</option>
-          </select>
+            Location
+          </label>
+          <Input
+            type="text"
+            id="location"
+            Style="w-full px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white/80 font-semibold"
+            {...register("location", { required: "Location is required" })}
+          />
+          {errors.location && (
+            <p className="text-red-500 text-sm">{errors.location.message}</p>
+          )}
         </div>
-      )}
 
-      {/* Display message for non-admin users indicating the status cannot be changed */}
-      {!isAdmin && (
-        <div className="mb-4">
-          <label htmlFor="nocStatus" className="block text-lg text-gray-800">NOC Status</label>
-          <p className="p-3 text-gray-500">You cannot edit the NOC status.</p>
-        </div>
-      )}
-
-      {/* Toggle for Current Location */}
-      <div className="mb-4 flex items-center">
-        <input
-          type="checkbox"
-          id="useCurrentLocation"
-          className="mr-2"
-          checked={useCurrentLocation}
-          onChange={handleLocationToggle}
-        />
-        <label htmlFor="useCurrentLocation" className="text-lg text-gray-800">Use Current Location</label>
-      </div>
-
-      {/* Button to fetch location */}
-      {useCurrentLocation && (
-        <div className="mb-4">
-          <button
-            type="button"
-            onClick={fetchCurrentLocation}
-            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition duration-300"
+        {/* NOC Status */}
+        <div className="flex flex-col">
+          <label
+            htmlFor="nocStatus"
+            className="text-xl font-semibold text-white/80"
           >
-            Use My Current Location
-          </button>
+            NOC Status
+          </label>
+          {isAdmin ? (
+            <select
+              id="nocStatus"
+              className="w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              {...register("nocStatus")}
+            >
+              <option value="Pending">Pending</option>
+              <option value="Applied">Applied</option>
+              <option value="Approved">Approved</option>
+              <option value="Denied">Denied</option>
+            </select>
+          ) : (
+            <p className="w-full px-3 py-2 text-gray-500 bg-gray-100 rounded-lg">
+              You cannot edit the NOC status.
+            </p>
+          )}
         </div>
-      )}
-
-      <button
-        type="submit"
-        className="w-full bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition duration-300"
-      >
-        Add Building
-      </button>
+        <div className="flex flex-col">
+          <Button
+            name="Add Building"
+            type="submit"
+            styles="w-full flex justify-center mt-6 bg-indigo-600 text-white w-full px-3 py-2 rounded-lg hover:bg-indigo-700 transition duration-300 font-semibold"
+          />
+        </div>
+      </div>
     </form>
+    <BuildingCard buildings={buildings}/>
+    </>
+
   );
 };
 

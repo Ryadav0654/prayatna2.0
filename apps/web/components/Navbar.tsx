@@ -75,7 +75,7 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="sm:hidden" id="mobile-menu">
-          <div className="space-y-1 px-2 pt-2 pb-3">
+          <div className="space-y-1 px-2 pt-2 pb-3 text-white">
             {
                 navLinks.map((link) => (
                   <motion.ul

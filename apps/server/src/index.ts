@@ -4,7 +4,7 @@ dotenv.config();
 import express, { Express } from "express";
 import { prismaClient } from "@repo/db/client";
 import { registerUser, signInUser } from "./controllers/user";
-import { createBuilding } from "./controllers/building";
+import { createBuilding, getAllBuildings } from "./controllers/building";
 import { verifyJWT } from "./middleware/verifyJwt";
 import { triggerAlarm } from "./controllers/alarm";
 import cors from "cors";
@@ -27,6 +27,7 @@ app.post("/users/signin",signInUser);
 
 //building 
 app.post("/building/create",verifyJWT,createBuilding);
+app.get("/building/all",verifyJWT, getAllBuildings);
 
 //trigger alarm
 app.post("/alarm/trigger",triggerAlarm);
