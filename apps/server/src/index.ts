@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+// import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 dotenv.config();
 import express, { Express } from "express";
@@ -8,11 +9,15 @@ import { createBuilding, getAllBuildings } from "./controllers/building";
 import { verifyJWT } from "./middleware/verifyJwt";
 import { triggerAlarm } from "./controllers/alarm";
 import cors from "cors";
-
+import { createApplication, processApplication } from "./controllers/noc";
+import { upload } from "./middleware/multer";
 const app: Express = express();
-app.use(express.json()); // Parse JSON request body
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
+// Parse JSON request body
+// app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
+// ✅ Accept text data from form-data
+// app.use(bodyParser.text({ type: "text/plain" }));
 app.use(cookieParser());
+app.use(express.json()); 
 app.use(cors({
     origin:"http://localhost:3000",
     credentials:true
@@ -32,6 +37,10 @@ app.get("/building/all",verifyJWT, getAllBuildings);
 //trigger alarm
 app.post("/alarm/trigger",triggerAlarm);
 
+// noc data 
+
+app.post("/noc/application",verifyJWT,createApplication)
+app.post("/noc/process",upload.single("document"),processApplication)
 app.listen(process.env.SERVER_PORT, async() => {
 
     try {

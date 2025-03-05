@@ -28,8 +28,7 @@ model Application {
   id          String   @id @default(uuid())
   applicantId String
   applicant   User     @relation("UserApplications", fields: [applicantId], references: [id])
-  businessName String
-  documents    String[]
+  businessName String?
   buildingId   String?
   building     Building? @relation(fields: [buildingId], references: [id])
   status       Status   @default(PENDING)
