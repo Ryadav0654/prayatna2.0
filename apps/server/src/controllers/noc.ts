@@ -41,6 +41,13 @@ export const processApplication = async (req: any, res: any) => {
         // if (!applicationId || !document) {
         //     return res.status(400).json({ error: "applicationId and document are required" });
         // }
+        const existingApplication = await prismaClient.application.findUnique({
+            where: { id: applicationId },
+        });
+        
+        if (!existingApplication) {
+            return res.status(404).json({ error: "Application not found" });
+        }
 
         console.log("here is "+document);
         const formData = new FormData();
@@ -52,24 +59,23 @@ export const processApplication = async (req: any, res: any) => {
             }
 
         formData.append("file", fs.createReadStream(document));
-        try {
             const response = await axios.post("http://localhost:8000/process_blueprint", formData, {
                 headers: {
                     ...formData.getHeaders(), // Set correct headers for multipart data
                 },
             });
             console.log(response);
-        } catch (error) {
-            console.log(error);
-            
+        let status:"PENDING"|"APPROVED"|"REJECTED" = "PENDING"
+        if(response.data.fire_risk_score<55){
+             status= "APPROVED"
         }
-        
-        
+        else{
+            status = "REJECTED"
+        }
         const application = await prismaClient.application.update({
             where: { id: applicationId },
             data: {
-                // document,
-                // status: "Processed", // Example: updating the status
+                status
             },
         });
 
