@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 dotenv.config();
 import express, { Express } from "express";
 import { prismaClient } from "@repo/db/client";
-import { registerUser, signInUser } from "./controllers/user";
+import { logoutUser, registerUser, signInUser } from "./controllers/user";
 import { createBuilding, getAllBuildings } from "./controllers/building";
 import { verifyJWT } from "./middleware/verifyJwt";
 import { triggerAlarm } from "./controllers/alarm";
@@ -29,10 +29,11 @@ app.get("/", (req, res) => {
 
 app.post("/users/register",registerUser);
 app.post("/users/signin",signInUser);
+app.post("/users/logout",logoutUser);
 
 //building 
 app.post("/building/create",verifyJWT,createBuilding);
-app.get("/building/all",verifyJWT, getAllBuildings);
+app.get("/building/all", verifyJWT, getAllBuildings);
 
 //trigger alarm
 app.post("/alarm/trigger",triggerAlarm);

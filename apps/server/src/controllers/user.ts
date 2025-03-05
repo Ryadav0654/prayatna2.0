@@ -101,3 +101,18 @@ export const signInUser = async (req: any, res: any) => {
     res.status(500).json({ message: "Server error", error: (error as Error).message });
   }
 }
+
+export const logoutUser = async (req: any, res: any) => {
+  try {
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+    return res
+      .status(201)
+      .clearCookie("accessToken", options)
+      .json({ message: "User logged out successfully" });
+  } catch (error) {
+    return res.status(500).json({ error: error });
+  }
+};
