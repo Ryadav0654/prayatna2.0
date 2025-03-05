@@ -13,12 +13,37 @@ const transporter = nodemailer.createTransport({
 });
 const notifyFireTeam = async (buildingId: string): Promise<void> => {
     try {
-        await transporter.sendMail({
-            from: "gurjargovinnd994@gmail.com",
-            to: "sahusamriddhi5@gmail.com",
-            subject: "Fire Alert Notification",
-            text: `Fire alert triggered for Building ID: ${buildingId}. Immediate response required!`
+        // Fetch building details (including coordinates)
+        const building = await prismaClient.building.findUnique({
+            where: { id: buildingId },
+            select: { address: true, latitude: true, longitude: true },
         });
+
+        if (!building) {
+            console.error("Building not found.");
+            return;
+        }
+
+        // Google Maps link with location
+        const googleMapsLink = `https://www.google.com/maps?q=${building.latitude},${building.longitude}`;
+
+        // Email content
+        const emailText = `
+            🚨 Fire Alert Triggered! 🚨
+            
+            Location: ${building.address}
+            View on Map: ${googleMapsLink}
+
+            Immediate response required!
+        `;
+
+        await transporter.sendMail({
+            from: "gurjargovind994@gmail.com",
+            to: "sahusamriddhi5@gmail.com",
+            subject: "🔥 Fire Alert Notification",
+            text: emailText
+        });
+
         console.log("Fire team notified successfully.");
     } catch (error) {
         console.error("Error notifying fire team:", error);
