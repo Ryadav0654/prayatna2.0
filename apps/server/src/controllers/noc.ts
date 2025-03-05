@@ -44,13 +44,26 @@ export const processApplication = async (req: any, res: any) => {
 
         console.log("here is "+document);
         const formData = new FormData();
+        console.log("Document Path:", document);
+
+            if (!document || !fs.existsSync(document)) {
+                console.error("❌ Error: Document file does not exist:", document);
+                return res.status(400).json({ error: "File not found" });
+            }
+
         formData.append("file", fs.createReadStream(document));
-        const response = await axios.post("http://localhost:8000/process_blueprint", formData, {
-            headers: {
-                ...formData.getHeaders(), // Set correct headers for multipart data
-            },
-        });
-        console.log(response);
+        try {
+            const response = await axios.post("http://localhost:8000/process_blueprint", formData, {
+                headers: {
+                    ...formData.getHeaders(), // Set correct headers for multipart data
+                },
+            });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+            
+        }
+        
         
         const application = await prismaClient.application.update({
             where: { id: applicationId },
