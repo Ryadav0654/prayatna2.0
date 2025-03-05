@@ -12,57 +12,57 @@ export type Building = {
   nocStatus: "Applied" | "Pending" | "Approved" | "Denied";
 };
 
-// const buildings: Building[] = [
-//   {
-//     id: 1,
-//     name: "Skyline Tower",
-//     location: "123 Main St, Downtown",
-//     latitude: 40.7128,
-//     longitude: -74.006,
-//     nocStatus: "Pending",
-//   },
-//   {
-//     id: 2,
-//     name: "Greenwood Heights",
-//     location: "456 Oak Rd, Uptown",
-//     latitude: 40.7306,
-//     longitude: -73.9352,
-//     nocStatus: "Approved",
-//   },
+const buildings: Building[] = [
+  {
+    id: 1,
+    name: "Skyline Tower",
+    location: "123 Main St, Downtown",
+    latitude: 40.7128,
+    longitude: -74.006,
+    nocStatus: "Pending",
+  },
+  {
+    id: 2,
+    name: "Greenwood Heights",
+    location: "456 Oak Rd, Uptown",
+    latitude: 40.7306,
+    longitude: -73.9352,
+    nocStatus: "Approved",
+  },
 
-//   {
-//     id: 3,
-//     name: "Ocean View Apartments",
-//     location: "789 Seaside Blvd, Beachside",
-//     latitude: 40.6782,
-//     longitude: -73.9442,
-//     nocStatus: "Applied",
-//   },
-//   {
-//     id: 4,
-//     name: "Ocean View Apartments",
-//     location: "789 Seaside Blvd, Beachside",
-//     latitude: 40.6782,
-//     longitude: -73.9442,
-//     nocStatus: "Applied",
-//   },
-//   {
-//     id: 5,
-//     name: "Ocean View Apartments",
-//     location: "789 Seaside Blvd, Beachside",
-//     latitude: 40.6782,
-//     longitude: -73.9442,
-//     nocStatus: "Applied",
-//   },
-//   {
-//     id: 6,
-//     name: "Ocean View Apartments",
-//     location: "789 Seaside Blvd, Beachside",
-//     latitude: 40.6782,
-//     longitude: -73.9442,
-//     nocStatus: "Applied",
-//   },
-// ];
+  {
+    id: 3,
+    name: "Ocean View Apartments",
+    location: "789 Seaside Blvd, Beachside",
+    latitude: 40.6782,
+    longitude: -73.9442,
+    nocStatus: "Applied",
+  },
+  {
+    id: 4,
+    name: "Ocean View Apartments",
+    location: "789 Seaside Blvd, Beachside",
+    latitude: 40.6782,
+    longitude: -73.9442,
+    nocStatus: "Applied",
+  },
+  {
+    id: 5,
+    name: "Ocean View Apartments",
+    location: "789 Seaside Blvd, Beachside",
+    latitude: 40.6782,
+    longitude: -73.9442,
+    nocStatus: "Applied",
+  },
+  {
+    id: 6,
+    name: "Ocean View Apartments",
+    location: "789 Seaside Blvd, Beachside",
+    latitude: 40.6782,
+    longitude: -73.9442,
+    nocStatus: "Applied",
+  },
+];
 
 type BuildingCardProps = {
   buildings: Building[];
