@@ -18,142 +18,143 @@ export default function ChatBoard() {
     scrollToBottom();
   }, [messages]);
 
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     if (!input.trim()) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
 
-//     const userMessage = { role: 'user', content: input };
-//     setMessages(prev => [...prev, userMessage]);
-//     setInput('');
-//     setIsTyping(true);
+    const userMessage = { role: 'user', content: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsTyping(true);
 
-//     try {
-//       const response = await axios.post('http://localhost:11434/api/chat', {
-        
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({
-//           model: 'llama3.2',
-//           messages: [...messages, userMessage],
-//         }),
-//       });
-
-//       if (!response.body) throw new Error('No response body');
-
-//       const reader = response.body.getReader();
-//       let aiResponse = '';
-
-//       // Initialize assistant message *immediately*
-//       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
-
-
-//       while (true) {
-//         const { done, value } = await reader.read();
-//         if (done) break;
-
-//         const text = new TextDecoder().decode(value);
-//         const lines = text.split('\n').filter(line => line.trim());
-
-//         for (const line of lines) {
-//           try {
-//             const data = JSON.parse(line);
-//             if (data.message?.content) {
-//               aiResponse += data.message.content;
-
-//               // *Crucially* update the last message in the array
-//               setMessages(prevMessages => {
-//                 const newMessages = [...prevMessages];
-//                 const lastMessage = newMessages[newMessages.length - 1];
-//                 if (lastMessage && lastMessage.role === 'assistant') {
-//                   lastMessage.content = aiResponse;
-//                 }
-//                 return newMessages;
-//               });
-//             }
-//           } catch (e) {
-//             console.error('Error parsing JSON:', e);
-//           }
-//         }
-//       }
-//     } catch (error) {
-//       console.error('Error:', error);
-//       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, there was an error processing your request.' }]);
-//     } finally {
-//       setIsTyping(false);
-//     }
-//   };
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!input.trim()) return;
-
-  const userMessage = { role: 'user', content: input };
-  setMessages(prev => [...prev, userMessage]);
-  setInput('');
-  setIsTyping(true);
-
-  try {
-    const response = await axios.post(
-      'http://localhost:11434/api/chat',
-      {
-        model: 'llama3', // Corrected model name (removed .2)
-        messages: [...messages, userMessage],
-      },
-      {
+    try {
+      const response = await fetch('http://localhost:11434/api/chat', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        responseType: 'stream', // Crucial: Set responseType to 'stream'
-      }
-    );
+        body: JSON.stringify({
+          model: 'llama3.2',
+          messages: [...messages, userMessage],
+        }),
+      });
 
-    // Access the stream directly from response.data
-    const stream = response.data;
-    const reader = stream.getReader(); // Get a reader from the stream
-    let aiResponse = '';
+      if (!response.body) throw new Error('No response body');
 
-    // Initialize the assistant message
-    setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+      const reader = response.body.getReader();
+      let aiResponse = '';
+      
+      // Initialize assistant message immediately
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-      const text = new TextDecoder().decode(value);
-      const lines = text.split('\n').filter(line => line.trim());
+        const text = new TextDecoder().decode(value);
+        const lines = text.split('\n').filter(line => line.trim());
+        
         for (const line of lines) {
           try {
             const data = JSON.parse(line);
-              if (data.message?.content) {
-                aiResponse += data.message.content;
-
-                setMessages(prevMessages => {
-                  const newMessages = [...prevMessages];
-                  const lastMessage = newMessages[newMessages.length - 1];
-                  if (lastMessage && lastMessage.role === 'assistant') {
-                    lastMessage.content = aiResponse;
-                  }
-                  return newMessages;
-                });
+            if (data.message?.content) {
+              aiResponse += data.message.content;
+              
+              // Update the last message with new content
+              setMessages(prev => {
+                const newMessages = [...prev];
+                const lastMessage = newMessages[newMessages.length - 1];
+                if (lastMessage && lastMessage.role === 'assistant') {
+                  lastMessage.content = aiResponse;
+                  return [...newMessages];
+                }
+                return prev;
+              });
             }
           } catch (e) {
-            console.error('Error parsing JSON:', line, e); // Log the problematic line
+            console.error('Error parsing JSON:', e);
           }
         }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, there was an error processing your request.' }]);
+    } finally {
+      setIsTyping(false);
     }
-  } catch (error) {
-    console.error('Error:', error);
-    // Handle Axios-specific errors more gracefully
-    if (axios.isAxiosError(error)) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `Sorry, there was an error: ${error.message}` }]);
-    } else {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, there was an unexpected error.' }]);
-    }
-  } finally {
-    setIsTyping(false);
-  }
-};
+  };
+
+// const handleSubmit = async (e: React.FormEvent) => {
+//   e.preventDefault();
+//   if (!input.trim()) return;
+
+//   const userMessage = { role: 'user', content: input };
+//   setMessages(prev => [...prev, userMessage]);
+//   setInput('');
+//   setIsTyping(true);
+
+//   try {
+//     const response = await axios.post(
+//       'http://localhost:11434/api/chat',
+//       {
+//         model: 'llama3', // Corrected model name (removed .2)
+//         messages: [...messages, userMessage],
+//       },
+//       {
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         responseType: 'stream', // Crucial: Set responseType to 'stream'
+//       }
+//     );
+
+//     // Access the stream directly from response.data
+//     const stream = response.data;
+//     const reader = stream.getReader(); // Get a reader from the stream
+//     let aiResponse = '';
+
+//     // Initialize the assistant message
+//     setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+//     while (true) {
+//       const { done, value } = await reader.read();
+//       if (done) break;
+
+//       const text = new TextDecoder().decode(value);
+//       const lines = text.split('\n').filter(line => line.trim());
+//         for (const line of lines) {
+//           try {
+//             const data = JSON.parse(line);
+//               if (data.message?.content) {
+//                 aiResponse += data.message.content;
+
+//                 setMessages(prevMessages => {
+//                   const newMessages = [...prevMessages];
+//                   const lastMessage = newMessages[newMessages.length - 1];
+//                   if (lastMessage && lastMessage.role === 'assistant') {
+//                     lastMessage.content = aiResponse;
+//                   }
+//                   return newMessages;
+//                 });
+//             }
+//           } catch (e) {
+//             console.error('Error parsing JSON:', line, e); // Log the problematic line
+//           }
+//         }
+//     }
+//   } catch (error) {
+//     console.error('Error:', error);
+//     // Handle Axios-specific errors more gracefully
+//     if (axios.isAxiosError(error)) {
+//       setMessages(prev => [...prev, { role: 'assistant', content: `Sorry, there was an error: ${error.message}` }]);
+//     } else {
+//       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, there was an unexpected error.' }]);
+//     }
+//   } finally {
+//     setIsTyping(false);
+//   }
+// };
+
   const toggleChat = () => {
     setIsChatOpen(prev => !prev);
   };
