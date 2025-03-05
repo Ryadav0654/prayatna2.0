@@ -39,14 +39,17 @@ model Application {
 }
 
 model Building {
-  id       String   @id @default(uuid())
-  address  String
-  ownerId  String
-  owner    User @relation("OwnerBuildings", fields: [ownerId], references: [id])
+  id        String   @id @default(uuid())
+  address   String?
+  latitude  String?
+  longitude String?
+  ownerId   String
+  owner     User @relation("OwnerBuildings", fields: [ownerId], references: [id])
 
   applications Application[]
   alarms       Alarm[] // One-to-many relation with Alarm
 }
+
 
 model Alarm {
   id          String   @id @default(uuid())
