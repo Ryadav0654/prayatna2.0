@@ -8,6 +8,7 @@ import { createBuilding } from "./controllers/building";
 import { verifyJWT } from "./middleware/verifyJwt";
 import { triggerAlarm } from "./controllers/alarm";
 import cors from "cors";
+import { createApplication } from "./controllers/noc";
 
 const app: Express = express();
 app.use(express.json()); // Parse JSON request body
@@ -30,6 +31,10 @@ app.post("/building/create",verifyJWT,createBuilding);
 
 //trigger alarm
 app.post("/alarm/trigger",triggerAlarm);
+
+// noc data 
+
+app.post("/noc/application",verifyJWT,createApplication)
 
 app.listen(process.env.SERVER_PORT, async() => {
 
