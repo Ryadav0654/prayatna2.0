@@ -90,6 +90,11 @@ export default function Home() {
               onclick={() => triggerAlert()}
               styles="bg-red-600 text-white py-3 px-4 rounded-xl font-bold mt-6"
             />
+             <Button
+              name="Process a NOC form"
+              onclick={() => router.push("/process-from")}
+              styles="bg-red-600 text-white py-3 px-4 rounded-xl font-bold mt-6"
+            />
           </div>
         </div>
       </section>
