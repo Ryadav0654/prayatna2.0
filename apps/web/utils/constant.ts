@@ -17,7 +17,7 @@ export const navLinks = [
     },
     
     {
-        name: "Alarm",
+        name: "Emergency Alarm",
         path: "/alarm"
     },
     // {

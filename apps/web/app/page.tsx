@@ -13,7 +13,8 @@ import Chatbot from "../components/Chatbot";
 import Loading from "../components/Loading";
 import Error from "../components/Loading";
 import ChatBoard from "../components/ChatBoard";
-
+import FireSafetyFAQ from "../components/FAQ";
+import NocAnalytics from "../components/NOCAnalytic";
 export default function Home() {
   const router = useRouter();
   const [triggered, setTriggered] = useState(false);
@@ -39,6 +40,9 @@ export default function Home() {
       console.error("error occured while trigger: ", error);
     }
   };
+  const totalApplicants = 1523;
+  const nocPassed = 875;
+  const certificatesIssued = 850;
 
   if (loading) {
     return <Loading text="Your request is being processed..." />;
@@ -97,7 +101,13 @@ export default function Home() {
       <section className="flex lg:flex-row h-[70vh] lg:h-[60vh] justify-center items-center">
         <BigCard />
       </section>
-
+      <NocAnalytics
+            totalApplicants={totalApplicants}
+            nocPassed={nocPassed}
+            certificatesIssued={certificatesIssued}
+        />
+      <FireSafetyFAQ/>
+      
       <section>
         <div className="flex h-[50vh] w-full justify-center items-center gap-6">
           <Card />
