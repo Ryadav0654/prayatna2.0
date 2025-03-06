@@ -108,14 +108,14 @@ export default function Home() {
         />
       <FireSafetyFAQ/>
       
-      <section>
+      {/* <section>
         <div className="flex h-[50vh] w-full justify-center items-center gap-6">
           <Card />
           <Card />
           <Card />
           <Card />
         </div>
-      </section>
+      </section> */}
       <Footer />
       {/* <FireNOCForm /> */}
       {/* <footer className="mt-16">
