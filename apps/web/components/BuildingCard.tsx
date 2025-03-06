@@ -65,12 +65,13 @@ const buildings: Building[] = [
 
 type BuildingCardProps = {
   buildings: Building[];
+  isNoc: boolean
 };
 
-const BuildingCard: React.FC<BuildingCardProps> = ({ buildings }) => {
+const BuildingCard: React.FC<BuildingCardProps> = ({ buildings, isNoc }) => {
   return (
     <div className='px-16 py-8'>
-    <h1 className="text-5xl md:text-4xl font-extrabold text-white">Building List</h1>
+    <h1 className="text-5xl md:text-4xl font-extrabold text-white">{(isNoc) ? "List of NOC's" : "List of Buildings"}</h1>
     <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-8 mt-5">
       {buildings.map((building) => (
         <div

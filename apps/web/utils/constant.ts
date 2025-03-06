@@ -9,17 +9,17 @@ export const navLinks = [
     },
     {
         name: "Add Building",
-        path: "/building"
-    },
-    {
-        name: "Emergency",
-        path: "/emergency"
+        path: "/add-building"
     },
     
     {
         name: "Emergency Alarm",
         path: "/alarm"
     },
+    // {
+    //     name: "Emergency",
+    //     path: "/emergency"
+    // },
     // {
     //     name: "Contact",
     //     path: "/contact"

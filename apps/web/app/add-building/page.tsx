@@ -205,7 +205,7 @@ const AddBuildingForm: React.FC<AddBuildingFormProps> = ({
         </div>
       </div>
     </form>
-    <BuildingCard buildings={buildings}/>
+    <BuildingCard buildings={buildings} isNoc={false}/>
     </>
 
   );
