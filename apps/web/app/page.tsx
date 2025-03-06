@@ -84,11 +84,11 @@ export default function Home() {
             time and ensure fire safety with smart automation.
           </p>
           <div className="flex flex-col lg:flex-row justify-center items-center  lg:gap-x-12">
-            <Button
+            {/* <Button
               name="Add Building"
               onclick={() => router.push("/add-building")}
               styles="bg-red-600 text-white  py-3 px-4 rounded-xl font-bold mt-6"
-            />
+            /> */}
             <Button
               name="Trigger Emergency Alert"
               onclick={() => triggerAlert()}
